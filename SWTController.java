@@ -5,6 +5,8 @@ import map.Cell;
 import map.CellEvent;
 import map.CellListener;
 import map.Map;
+import map.Map1;
+import map.Map3;
 import map.out.CellPanel;
 import map.out.ColorCell;
 import map.out.MapPanel;
@@ -54,7 +56,9 @@ public class SWTController {
 		Button toggleButton = new Button(shell, SWT.TOGGLE);
 	    toggleButton.setText("Explorar");  
 	    
-		final Map map = new Map(15,15);
+	    final Label status;
+	    
+		final Map map = new Map3(15,15);
 		
 		/*Space space = new Space();
 		Wall wall = new Wall();
@@ -69,20 +73,7 @@ public class SWTController {
 		}
 		final World world = new World(map);
 		*/
-		Space space = new Space();
-		Wall wall = new Wall();
-		for (int i=1;i<=map.getWidth();i++) {
-			for (int j=1;j<=map.getHeight();j++) {
-				if ((i==1 || i==map.getWidth())/* && (j!=5 && j!=6)*/) map.getCell(i,j).addObject(wall);
-				else map.getCell(i,j).addObject(space);
-			}
-		}
-		for (int p=5;p<=map.getWidth();p++) {
-			map.getCell(4,p).addObject(wall);
-		}
-		for (int p=8;p<=13;p++) {
-			map.getCell(p,10).addObject(wall);
-		}
+		
 		
 		final World world = new ToricWorld(map);
 		
@@ -95,6 +86,10 @@ public class SWTController {
 		colors.addColor(Space.class, new Color(null,230,230,230));
 		colors.addColor(Wall.class, new Color(null,0,0,0));
 		final MapPanel mapPanel = new MapPanel(shell, map,colors);
+		
+		status = new Label(shell, SWT.CENTER);
+		    status.setText("Waiting for the first movement");
+		//final int movements = 0;
 		GridData spec = new GridData();
 	    spec.horizontalAlignment = GridData.FILL;
 	    spec.grabExcessHorizontalSpace = true;
@@ -102,6 +97,7 @@ public class SWTController {
 	    spec.grabExcessVerticalSpace = true;
 	    mapPanel.setLayoutData(spec);
 	    map.addCellListener(new CellListener(){
+	    	int movements = 0;
 			public void cellAdded(CellEvent e) {
 				if (e.worldObject.is(BasicRobot.class)) {
 					BasicRobot robotx = ((BasicRobot)e.worldObject);
@@ -127,9 +123,9 @@ public class SWTController {
 
 			public void cellRemoved(CellEvent e) {
 				CellPanel c = mapPanel.getCellPanel(((Cell)e.getSource()).getPosition());
-
-				c.property(Animotion.Property.WIDTH, 100).property(100, ((Integer)c.property(100))+1);
 				
+				c.property(Animotion.Property.WIDTH, 100).property(100, ((Integer)c.property(100))+1);
+				status.setText("Number of movements: "+(++this.movements));
 			}
 			
 		});
